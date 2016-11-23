@@ -120,9 +120,21 @@ break.dates <- breakdates(breaks)
 # to see if relative magnitudes change
 
 reg.df <- df.monthly %>% filter(area=='south') %>% mutate(break2010=ifelse(year>2010,1,0))
-summary(lm(lntrips~factor(month)+factor(month)*break2010,data=reg.df))
+summary(lm(lntrips~factor(month)+factor(year) + factor(month)*break2010,data=reg.df))
+#-----------------------------------------------------------
 
+#----------------------------------------------------------
+#breakpoint analysis on the detrended series
+reg.df <- df.monthly %>% filter(area=='north')
+reg <- lm(lntrips~factor(year)-1,data=reg.df)
 
+reg.df <- reg.df %>% ungroup() %>% mutate(ols.resid=residuals(reg))
+ggplot(reg.df,aes(x=date,y=ols.resid)) + geom_line() + geom_point()
+
+f_statistics <- Fstats(ts(ols.resid,frequency=12, start=c(1994, 1)) ~ 1 , data = reg.df)
+plot(f_statistics)
+breaks <- breakpoints(ts(ols.resid,frequency=12, start=c(1994, 1)) ~ 1, data = reg.df)
+summary(breaks)
 
 #----------------------------------------------------------
 
