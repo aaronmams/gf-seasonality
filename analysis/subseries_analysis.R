@@ -121,6 +121,10 @@ break.dates <- breakdates(breaks)
 
 reg.df <- df.monthly %>% filter(area=='south') %>% mutate(break2010=ifelse(year>2010,1,0))
 summary(lm(lntrips~factor(month)+factor(year) + factor(month)*break2010,data=reg.df))
+
+#for the north
+reg.df <- df.monthly %>% filter(area=='north') %>% mutate(break2010=ifelse(year>2010,1,0))
+summary(lm(lntrips~factor(month)+factor(year) + factor(month)*break2010,data=reg.df))
 #-----------------------------------------------------------
 
 #----------------------------------------------------------
@@ -135,7 +139,18 @@ f_statistics <- Fstats(ts(ols.resid,frequency=12, start=c(1994, 1)) ~ 1 , data =
 plot(f_statistics)
 breaks <- breakpoints(ts(ols.resid,frequency=12, start=c(1994, 1)) ~ 1, data = reg.df)
 summary(breaks)
-
 #----------------------------------------------------------
 
+#-----------------------------------------------------------
+# test the individual monthly series for trend 
+ggplot(df.monthly,aes(x=year,y=lntrips12,color=area)) + geom_point() + geom_line() + 
+    facet_wrap(~month)
 
+
+summary(lm(lntrips~t,data=z))
+ggplot(z,aes(x=year,y=diff)) + geom_line() + geom_point()
+f_statistics <- Fstats(lntrips~t, data = z)
+plot(f_statistics)
+
+
+#-----------------------------------------------------------
